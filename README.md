@@ -13,7 +13,7 @@ python wr.py --account_name 'GitHub Username' --token 'Your GitHub Token'
 详细指令如下。
 
 
-```bash
+```
 usage: wr.py [-h] [--account_name ACCOUNT_NAME] [--user_name USER_NAME]
              [--token TOKEN] [--days DAYS] [--endpoint ENDPOINT]
              [--branch {all,default}]
@@ -23,7 +23,7 @@ optional arguments:
   --account_name ACCOUNT_NAME
                         GitHub account name
   --user_name USER_NAME
-                        The name displayed on Github
+                        The name displayed on GitHub
   --token TOKEN         Your personal token
   --days DAYS           The time range of your contributions
   --endpoint ENDPOINT   The GitHub GraphQL endpoint
@@ -61,7 +61,7 @@ read:gpg_key
 
 ## Why use GraphQL API
 
-[GraphQL API](https://docs.github.com/en/graphql) (Github API v4) 相比于 [REST API](https://docs.github.com/en/rest) 更为优雅，但是写起来也比后者复杂一些。
+[GraphQL API](https://docs.github.com/en/graphql) (GitHub API v4) 相比于 [REST API](https://docs.github.com/en/rest) 更为优雅，但是写起来也比后者复杂一些。
 
 
 ## To-do

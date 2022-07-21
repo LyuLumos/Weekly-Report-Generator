@@ -58,20 +58,23 @@ class GraphQLQuery:
         urls = urls_json['data']['user']['contributionsCollection']['commitContributionsByRepository']
         return [i['repository']['url'] for i in urls]
 
-    def query_repo_defaultbranch_commits(self, owner, repo, lmt):
+    def query_repo_branch_commits(self, owner, repo, lmt, branch):
         """
-        It takes in the owner of the repo, the repo name, and a time limit and
-        returns a list, where each sublist contains the commit message and the commit URL on default branch
+        It queries the GitHub API for commits made to a specific branch of a repository within
+        a specific time range
 
-        :param owner: The owner of the repository
-        :param repo: the name of the repository
-        :param lmt: the time limit for the query
-        :return: A list of lists. Each list contains the commit message and the commit URL.
+        :param owner: The owner of the repo
+        :param repo: the name of the repo
+        :param lmt: the time limit for the query, in this case, it's the last time the script was run
+        :param branch: The branch you want to query
         """
+
+        ref_command = 'defaultBranchRef' if branch == 'default' else 'ref(qualifiedName: "{branch_name}")'.format(
+            branch_name=branch)
         query = '''
         query($owner: String!, $repo: String!, $time_limit: GitTimestamp!){
           repository(owner: $owner, name: $repo) {
-            defaultBranchRef {
+            %s {
               target {
                 ... on Commit {
                   history(since: $time_limit) {
@@ -90,7 +93,7 @@ class GraphQLQuery:
             }
           }
         }
-        '''
+        ''' % ref_command
         variables = {
             'owner': owner,
             'repo': repo,
@@ -98,8 +101,9 @@ class GraphQLQuery:
         }
         commits_json = self.run_query(query=query, variables=variables)
         # print(commits_json)
-        commits = commits_json['data']['repository']['defaultBranchRef']['target']['history']['nodes']
-        return [[i['message'], i['commitUrl'], repo] for i in commits if i['author']['name'] in [self.account_name, self.user_name]]
+        commits = commits_json['data']['repository']['defaultBranchRef' if branch ==
+                                                     'default' else 'ref']['target']['history']['nodes']
+        return [[i['message'], i['commitUrl'], branch] for i in commits if i['author']['name'] in [self.account_name, self.user_name]]
 
     def query_repo_all_branches(self, owner, repo):
         """
@@ -129,41 +133,6 @@ class GraphQLQuery:
         branches_json = self.run_query(query=query, variables=variables)
         branches = branches_json['data']['repository']['refs']['edges']
         return [i['node']['branchName'] for i in branches]
-
-    def query_repo_allbranch_commits(self, owner, repo, lmt, branch_name):
-        query = '''
-        query($owner: String!, $repo: String!, $time_limit: GitTimestamp!, $branch_name: String!){
-          repository(owner: $owner, name: $repo) {
-            ref(qualifiedName: $branch_name) {
-              target {
-                ... on Commit {
-                  history(since: $time_limit) {
-                    nodes {
-                      author {
-                        name
-                      }
-                      commitUrl
-                      message
-                      committedDate
-                    }
-                    totalCount
-                  }
-                }
-              }
-            }
-          }
-        }
-        '''
-        variables = {
-            'owner': owner,
-            'repo': repo,
-            'time_limit': lmt,
-            'branch_name': branch_name
-        }
-        commits_json = self.run_query(query=query, variables=variables)
-        # print(commits_json)
-        commits = commits_json['data']['repository']['ref']['target']['history']['nodes']
-        return [[i['message'], i['commitUrl'], branch_name] for i in commits if i['author']['name'] in [self.account_name, self.user_name]]
 
 
 def time_limit(days=7):
@@ -226,23 +195,20 @@ if __name__ == "__main__":
     repo_urls = test.query_commit_repo(args.account_name, time_lmt)
     res = {}
 
-    if args.branch == 'default':
-        for repo_url in repo_urls:
-            repo, owner = repo_url.split('/')[-1], repo_url.split('/')[-2]
-            res[repo] = test.query_repo_defaultbranch_commits(
-                owner, repo, time_lmt)
-        print(res)
-        gen_markdown(time_lmt, cur_time, res)
+    for repo_url in repo_urls:
+        repo, owner = repo_url.split('/')[-1], repo_url.split('/')[-2]
+        if args.branch == 'default':
+            res[repo] = test.query_repo_branch_commits(
+                owner, repo, time_lmt, args.branch)
 
-    elif args.branch == 'all':
-        for repo_url in repo_urls:
-            repo, owner = repo_url.split('/')[-1], repo_url.split('/')[-2]
+        elif args.branch == 'all':
             branches = test.query_repo_all_branches(owner, repo)
             res[repo] = []
             for branch in branches:
                 res[repo].extend(
-                    test.query_repo_allbranch_commits(
+                    test.query_repo_branch_commits(
                         owner, repo, time_lmt, branch)
                 )
-        print(res)
+
+        # print(res)
         gen_markdown(time_lmt, cur_time, res)

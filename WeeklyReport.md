@@ -20,6 +20,7 @@
 - [main@c7f312d1](https://github.com/LyuLumos/ftp/commit/c7f312d1eda4727941b9d8b09a030d1c29a41991) add Botnet(cart+nn)
 - [main@321fbd25](https://github.com/LyuLumos/ftp/commit/321fbd25607c7ae617b0d57d383bf9e948d700be) add [You are How You Click]
 ## Weekly-Report-Generator
+- [main@f8bdf805](https://github.com/LyuLumos/Weekly-Report-Generator/commit/f8bdf805816e29a91e142927f146870e8e948cc6) add multi-branch support
 - [main@152c2cd6](https://github.com/LyuLumos/Weekly-Report-Generator/commit/152c2cd652d5b2ba359a585d8d871c97215327dc) Upload code
 - [main@6e269cef](https://github.com/LyuLumos/Weekly-Report-Generator/commit/6e269cef171ef8d68e2defe1c1932dd9a82241b9) Initial commit
 ## Papers-Summary-2022
@@ -38,4 +39,4 @@
 ## linux-2020-LyuLumos
 - [master@79612a66](https://github.com/CUCCS/linux-2020-LyuLumos/commit/79612a66f44930210699815336b9cda1532be18a) Create README.md
 
-Collected from 2022-01-02T10:35:31Z to 2022-07-21T10:35:31Z
+Collected from 2022-01-02T11:24:28Z to 2022-07-21T11:24:28Z
