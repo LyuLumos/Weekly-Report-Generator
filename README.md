@@ -10,7 +10,7 @@
 python wr.py --account_name 'GitHub Username' --token 'Your GitHub Token' 
 ```
 
-详细指令如下。
+详细指令如下
 
 
 ```
@@ -63,11 +63,17 @@ read:gpg_key
 
 [GraphQL API](https://docs.github.com/en/graphql) (GitHub API v4) 相比于 [REST API](https://docs.github.com/en/rest) 更为优雅，但是写起来也比后者复杂一些。
 
+## GitLab: Not Support
+
+当前仓库不支持 GitLab。GitLab 常规用户拥有的权限非常有限，很难使用 `GitLab GraphQL API` 去查询 commits，`GitLab REST API` 会是更好的选择。如有需要请自行查阅 [API Docs | GitLab](https://docs.gitlab.com/ee/api/)。
+
+另一方面，如果你的仓库内容不涉密，可以使用 [GitLab CI](https://docs.gitlab.com/ee/ci/) 等工具，在 GitLab 上更新时同步更新到 GitHub 的私有仓库中，也可以达到同样的效果。
+
+
 
 ## To-do
 
-- GitLab Support
-- Issues, PR, Repo as contribution
+- [ ] Issues, PR, Repo Creation as contribution
 
 
 ## An Example

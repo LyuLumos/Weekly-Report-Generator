@@ -65,7 +65,7 @@ class GraphQLQuery:
 
         :param owner: The owner of the repo
         :param repo: the name of the repo
-        :param lmt: the time limit for the query, in this case, it's the last time the script was run
+        :param lmt: the time limit for the query
         :param branch: The branch you want to query
         """
 
@@ -209,6 +209,5 @@ if __name__ == "__main__":
                     test.query_repo_branch_commits(
                         owner, repo, time_lmt, branch)
                 )
-
-        # print(res)
-        gen_markdown(time_lmt, cur_time, res)
+    # print(res)
+    gen_markdown(time_lmt, cur_time, res)
