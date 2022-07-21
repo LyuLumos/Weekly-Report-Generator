@@ -7,12 +7,29 @@
 ## Usage
 
 ```bash
-python wr.py --account_name "GitHub Username" --token 'Your GitHub Token' 
+python wr.py --account_name 'GitHub Username' --token 'Your GitHub Token' 
 ```
-也可以使用如下命令查看详细指令。
+
+详细指令如下。
+
 
 ```bash
-python wr.py --help
+usage: wr.py [-h] [--account_name ACCOUNT_NAME] [--user_name USER_NAME]
+             [--token TOKEN] [--days DAYS] [--endpoint ENDPOINT]
+             [--branch {all,default}]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --account_name ACCOUNT_NAME
+                        GitHub account name
+  --user_name USER_NAME
+                        The name displayed on Github
+  --token TOKEN         Your personal token
+  --days DAYS           The time range of your contributions
+  --endpoint ENDPOINT   The GitHub GraphQL endpoint
+  --branch {all,default}
+                        Whether the scope covers all branches or the default
+                        branch
 ```
 
 ## Notes

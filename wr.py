@@ -99,7 +99,7 @@ class GraphQLQuery:
         commits_json = self.run_query(query=query, variables=variables)
         # print(commits_json)
         commits = commits_json['data']['repository']['defaultBranchRef']['target']['history']['nodes']
-        return [[i['message'], i['commitUrl']] for i in commits if i['author']['name'] in [self.account_name, self.user_name]]
+        return [[i['message'], i['commitUrl'], repo] for i in commits if i['author']['name'] in [self.account_name, self.user_name]]
 
     def query_repo_all_branches(self, owner, repo):
         """
@@ -130,6 +130,41 @@ class GraphQLQuery:
         branches = branches_json['data']['repository']['refs']['edges']
         return [i['node']['branchName'] for i in branches]
 
+    def query_repo_allbranch_commits(self, owner, repo, lmt, branch_name):
+        query = '''
+        query($owner: String!, $repo: String!, $time_limit: GitTimestamp!, $branch_name: String!){
+          repository(owner: $owner, name: $repo) {
+            ref(qualifiedName: $branch_name) {
+              target {
+                ... on Commit {
+                  history(since: $time_limit) {
+                    nodes {
+                      author {
+                        name
+                      }
+                      commitUrl
+                      message
+                      committedDate
+                    }
+                    totalCount
+                  }
+                }
+              }
+            }
+          }
+        }
+        '''
+        variables = {
+            'owner': owner,
+            'repo': repo,
+            'time_limit': lmt,
+            'branch_name': branch_name
+        }
+        commits_json = self.run_query(query=query, variables=variables)
+        # print(commits_json)
+        commits = commits_json['data']['repository']['ref']['target']['history']['nodes']
+        return [[i['message'], i['commitUrl'], branch_name] for i in commits if i['author']['name'] in [self.account_name, self.user_name]]
+
 
 def time_limit(days=7):
     """
@@ -153,14 +188,14 @@ def gen_markdown(begin_time, end_time, res):
 
     :param begin_time: the start time of the report
     :param end_time: the end time of the report, in the format of '%Y-%m-%dT%H:%M:%SZ'
-    :param res: a dictionary of the form {repo_name: [(commit_message, commit_link), ...], ...}
+    :param res: a dictionary of the form {repo_name: [(commit_message, commit_link, branch_name), ...], ...}
     """
     f = open("WeeklyReport.md", "w", encoding='utf-8')
     print('# Weekly Report', file=f)
     for repo, commits_info in res.items():
         print('## {repo_name}'.format(repo_name=repo), file=f)
         for commits in commits_info:
-            short_title = repo + '@' + commits[1].split('/')[-1][:8]
+            short_title = commits[2] + '@' + commits[1].split('/')[-1][:8]
             print('- [{title}]({link}) {commit_message}'.format(title=short_title,
                   link=commits[1], commit_message=commits[0].replace('\n', ' ')), file=f)
     print(file=f)
@@ -178,6 +213,8 @@ def arguments():
                         help='The time range of your contributions')
     parser.add_argument("--endpoint", default='https://api.github.com/graphql',
                         help='The GitHub GraphQL endpoint')
+    parser.add_argument('--branch', choices=['all', 'default'], default='all',
+                        help='Whether the scope covers all branches or the default branch')
     return parser.parse_args()
 
 
@@ -188,8 +225,24 @@ if __name__ == "__main__":
                         args.endpoint, args.user_name)
     repo_urls = test.query_commit_repo(args.account_name, time_lmt)
     res = {}
-    for repo_url in repo_urls:
-        repo, owner = repo_url.split('/')[-1], repo_url.split('/')[-2]
-        res[repo] = test.query_repo_defaultbranch_commits(
-            owner, repo, time_lmt)
-    gen_markdown(time_lmt, cur_time, res)
+
+    if args.branch == 'default':
+        for repo_url in repo_urls:
+            repo, owner = repo_url.split('/')[-1], repo_url.split('/')[-2]
+            res[repo] = test.query_repo_defaultbranch_commits(
+                owner, repo, time_lmt)
+        print(res)
+        gen_markdown(time_lmt, cur_time, res)
+
+    elif args.branch == 'all':
+        for repo_url in repo_urls:
+            repo, owner = repo_url.split('/')[-1], repo_url.split('/')[-2]
+            branches = test.query_repo_all_branches(owner, repo)
+            res[repo] = []
+            for branch in branches:
+                res[repo].extend(
+                    test.query_repo_allbranch_commits(
+                        owner, repo, time_lmt, branch)
+                )
+        print(res)
+        gen_markdown(time_lmt, cur_time, res)
