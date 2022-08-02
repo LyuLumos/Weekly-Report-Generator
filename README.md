@@ -41,6 +41,8 @@ python wr.py --account_name 'GitHub Username' --token 'Your GitHub Token'
 bash wr.sh
 ```
 
+代码中的 `--author` 代表是否指定提交人的信息，生成个人周报的时候可以取消注释。
+
 GitLab 常规用户拥有的权限非常有限，很难使用 `GitLab GraphQL API` 去查询 commits，`GitLab REST API` 会是更好的选择。如有需要请自行查阅 [API Docs | GitLab](https://docs.gitlab.com/ee/api/)。
 
 另一方面，如果你的仓库内容不涉密，可以使用 [GitLab CI](https://docs.gitlab.com/ee/ci/) 等工具，在 GitLab 上更新时同步更新到 GitHub 的私有仓库中，也可以达到同样的效果。

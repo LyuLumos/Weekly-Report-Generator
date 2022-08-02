@@ -11,4 +11,4 @@ if [[ ! "$(git rev-parse --git-dir 2> /dev/null)" ]]; then echo "${folder} is NO
 git log --all --pretty=format:"- ${folder}@%h: %s (%cn)" --since=${weeks_delta}.weeks #--author=${author}
 done
 
-echo "Generate form `date -d -"${weeks_delta} week" +%Y-%m-%d` to `date +%Y-%m-%d`"
+echo "Generated from `date -d -"${weeks_delta} week" +%Y-%m-%d` to `date +%Y-%m-%d`"
