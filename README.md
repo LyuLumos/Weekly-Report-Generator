@@ -29,19 +29,31 @@ python wr.py --account_name 'GitHub Username' --token 'Your GitHub Token'
 ```
 ├── Weekly-Report-Generator/
 │   ├── .git/
+│   └── ...
 ├── ftp/
 │   ├── .git/
+│   └── ...
 ├── ...
 └── wr.sh
 ```
 
-执行指令
+接着执行指令
 
 ```bash
 bash wr.sh
 ```
 
-代码中的 `--author` 代表是否指定提交人的信息，生成个人周报的时候可以取消注释。
+需要保证的是，各仓库均已拉取各分支最新的更改，可使用如下代码拉取某个仓库所有分支的更改
+
+```bash
+git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
+git fetch --all 
+git pull --all
+```
+
+`wr.sh` 中的 `--author` 代表是否指定提交人的信息，生成个人周报的时候可以取消注释。
+
+**请注意**
 
 GitLab 常规用户拥有的权限非常有限，很难使用 `GitLab GraphQL API` 去查询 commits，`GitLab REST API` 会是更好的选择。如有需要请自行查阅 [API Docs | GitLab](https://docs.gitlab.com/ee/api/)。
 
@@ -50,7 +62,7 @@ GitLab 常规用户拥有的权限非常有限，很难使用 `GitLab GraphQL AP
 
 ## Create a token
 
-需要 `token` 才能与 GraphQL 服务器通信。
+需要 `token` 才能与GitHub GraphQL 服务器通信。
 
 `Settings` > `Developer settings` > `Personal access tokens` > `Generate new token`
 
